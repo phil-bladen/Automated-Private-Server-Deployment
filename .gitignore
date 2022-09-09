@@ -1,0 +1,47 @@
+## General
+.DS_Store
+
+# Lock files
+lock.json
+# Local .terraform directories
+**/.terraform/*
+
+# State files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# SSH Keys
+*MYPRIVATEKEY.pem*
+
+
+# Overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# macOS files
+.DS_Store
+
+# Editor backups
+*~
+
+# Local Inspec Vendor Directories
+**/vendor/*
+
+# VSCode specific files that are ignored for clarity's sake
+*.code-workspace
+
+# Ansible Roles
+#CONTRIBUTING*
+
+# Bootstraping files
+**/bootstrap/*
+*.log
+.history/*
+*.hcl
+
+PBLADEN_Project_One_Terraform/example-root/terraform.tfvars

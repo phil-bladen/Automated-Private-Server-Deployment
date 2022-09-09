@@ -1,0 +1,41 @@
+---
+- name: Bastion Setup
+  gather_facts: yes
+  hosts: bastion
+  remote_user: ec2-user
+
+  roles:
+  
+    - role: disk-management
+      vars:
+        disk_create: true
+        disk_resize: true
+        disk_preset_selection: 'custom'
+        custom:
+          extra: # name of the logical volume group
+            mount_point: "/extra"
+            size: 5 # size of volume in gigabytes
+
+    - role: repository-management
+      vars:
+        repo_enable: true
+        application_preset_selection: ['base']
+      become: yes
+
+    - role: tag-management
+      vars:
+        aws_tag_null_context_control: true
+        attributes: {}
+
+    - role: myBastion
+
+    - role: aws-cloudwatch-agent
+      become: true
+      vars:
+        application_preset_selection: "default" # we need a string instead of the list variable 'application_preset_selection' in call to 'repository-management' role above
+
+    - role: aws-cloudwatch-alarms
+      vars:
+        aws_sns_subscription_email: "{{my_sns_subscription_email}}"
+        aws_topic_name: "{{my_sns_topic_name}}"
+...

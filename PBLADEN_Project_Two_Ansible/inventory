@@ -1,0 +1,10 @@
+[openvpn]
+<insert_public_instance_public_ip_here>
+
+[bastion]
+<insert_private_instance_private_ip_here>
+
+[bastion:vars]
+employee_id = <insert_employee_id_here>
+my_sns_topic_name = <insert_sns_topic_name_here>
+my_sns_subscription_email = <insert_email_for_sns_subscription_here>

@@ -1,0 +1,13 @@
+/var/log/ansible/*.log {
+    create 666
+    missingok
+    ifempty
+    size 0
+    rotate 7
+    dateext
+    dateformat .%s
+    su root root
+    postrotate
+        find /var/log/ansible -type f -name 'ansible.log*' -mtime +1 | while read f; do mv -v "$f" "/extra/archive-${f##*/}"; done
+    endscript
+}

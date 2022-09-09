@@ -1,0 +1,14 @@
+---
+# defaults file for myBastion
+
+# Note: The only variable used in this role is "employee-id".
+
+# Because of the following:
+#    * "employee-id" is a user specific value
+#    * there is no sensible 'default' for "employee-id"
+#    * this role is intended for use as part of a set of playbooks
+# I have not defined a default value for "employee-id" here.
+
+# Instead, I rely on the user to specify this value in the inventory file
+# used by the set of playbooks at /PBLADEN_Project_Two_Ansible, and
+# have instructed them to do so in /PBLADEN_Project_Two_Ansible/readme.md

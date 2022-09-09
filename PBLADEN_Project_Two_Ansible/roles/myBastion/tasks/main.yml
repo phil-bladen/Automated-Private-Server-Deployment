@@ -1,0 +1,110 @@
+---
+# tasks file for myBastion
+- name: Change bastion hostname to variable employee ID
+  ansible.builtin.hostname:
+    name: "{{ employee_id }}-bastion"
+  become: true
+
+- name: Ensure /var/log/ansible directory exists and anyone can read+write to it
+  ansible.builtin.file:
+    path: /var/log/ansible
+    state: directory
+    mode: "a=rw" # 0666: u=rw, g=rw, o=rw
+  become: true
+
+- name: Ensure /var/log/ansible/ansible.log exists and anyone can read+write to it
+  ansible.builtin.file:
+    path: /var/log/ansible/ansible.log
+    state: touch
+    mode: "a=rw" # 0666: u=rw, g=rw, o=rw
+  become: true
+
+- name: Set ansible.cfg file contents (disables host-key checking, enables logging) and ensure the owner (root) can read/write
+  ansible.builtin.template:
+    src: "etc/ansible/ansible.cfg.j2"
+    dest: /etc/ansible/ansible.cfg
+    mode: "o=rw" # 0600
+    backup: yes
+  become: true
+
+- name: Ensure that ansible logrotate is set to run every 4 hours in /etc/cron.d/logrotate entry
+  ansible.builtin.cron:
+    job: "/usr/sbin/logrotate /etc/logrotate.d/ansible"
+    name: "logrotate"
+    hour: "*/4"
+    minute: "0"
+    user: "root"
+    cron_file: "logrotate" # recommended by Christopher Hubbard, makes prod system debugging easier
+  become: true
+
+- name: Ensure that wtmp logrotate is set to run every Monday in /etc/cron.d/logrotate entry
+  ansible.builtin.cron:
+    job: "/usr/sbin/logrotate /etc/logrotate.d/wtmp"
+    name: "wtmp"
+    hour: "0"
+    minute: "1"
+    weekday: "1"
+    user: "root"
+    cron_file: "logrotate" # recommended by Christopher Hubbard, makes prod system debugging easier
+  become: true
+
+- name: Ensure that ansible logrotate configuration file is correctly formatted
+  ansible.builtin.template:
+    src: "etc/logrotate.d/ansible.j2"
+    dest: "/etc/logrotate.d/ansible"
+  become: true
+
+- name: Ensure that wtmp logrotate configuration file is correctly formatted
+  ansible.builtin.template:
+    src: "etc/logrotate.d/wtmp.j2"
+    dest: "/etc/logrotate.d/wtmp"
+  become: true
+
+- name: Ensure /usr/local/bin/terraform-files repo exists for later cloning of tfenv repo
+  ansible.builtin.file:
+    path: /usr/local/bin/terraform-files
+    state: directory
+  become: true
+
+- name: Clone tfenv repo to /usr/local/bin/terraform-files for terraform install
+  ansible.builtin.git:
+    repo: "https://github.com/tfutils/tfenv.git"
+    dest: "/usr/local/bin/terraform-files"
+    force: yes
+  become: true
+
+- name: Add symlink for 'tfenv' to /usr/local/bin
+  ansible.builtin.file:
+    src: "/usr/local/bin/terraform-files/bin/tfenv"
+    dest: "/usr/local/bin/tfenv"
+    owner: ec2-user
+    state: link
+  become: true
+
+- name: Add symlink for 'terraform' to /usr/local/bin
+  ansible.builtin.file:
+    src: "/usr/local/bin/terraform-files/bin/terraform"
+    dest: "/usr/local/bin/terraform"
+    owner: ec2-user
+    state: link
+  become: true
+
+- name: Initialize tfenv
+  ansible.builtin.shell: tfenv init
+  become: true
+
+- name: Use tfenv to install latest version of terraform
+  ansible.builtin.command: tfenv install latest
+  become: true
+
+- name: Configure tfenv to use latest version of terraform
+  ansible.builtin.command: tfenv use latest
+  become: true
+
+- name: Recursively set /usr/local/bin/terraform-files directory permissions so anyone can run terraform and tfenv
+  ansible.builtin.file:
+    path: /usr/local/bin/terraform-files
+    state: directory
+    mode: "a=rwx" # 0777: u=rwx, g=rwx, o=rwx
+    recurse: yes
+  become: true

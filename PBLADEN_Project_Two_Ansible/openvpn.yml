@@ -1,0 +1,17 @@
+---
+- name: OpenVPN Setup
+  gather_facts: yes
+  hosts: openvpn
+  remote_user: ec2-user
+  roles:
+    - role: openvpn
+      clients: [vpnuser] #configure clients list here
+      openvpn_redirect_gateway: false
+      openvpn_push:
+        - "route 10.9.0.0 255.255.255.0" # openVPN network
+        - "route 10.0.1.0 255.255.255.0" # public subnet
+        - "route 10.0.2.0 255.255.255.0" # private subnet
+      # connected client machines should be able to connect
+      # to private IP addresses in subnets above
+      become: yes
+...

@@ -1,0 +1,13 @@
+/var/log/wtmp {
+    copy
+    missingok
+    notifempty
+    size 15k
+# ^^^^^ rotate if larger than 15KB
+    olddir /var/log/wtmp-rotated-logs
+# ^^^^ rotate logs to /var/log/wtmp-rotated-logs
+    createolddir
+# ^^^^^ create /var/log/wtmp-rotated-logs/ on rotation if it doesn't exist already
+    rotate 10
+    su root root
+}
